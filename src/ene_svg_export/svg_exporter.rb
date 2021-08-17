@@ -10,6 +10,7 @@ module Eneroth
         model.selection.each { |e| bounds.add(e.bounds) }
 
         # TODO: Ask scale
+        scale = 0.1
 
         basename = File.basename(model.path)
         basename = "Untitled" if basename.empty? # REVIEW: Want to have the translated name.
@@ -20,9 +21,10 @@ module Eneroth
 
         # For once the BoindingBox#height method (Y extents) is what we regard as
         # height, as we are doing a 2D on the XY plane. Wohoo!
-        svg = svg_start(bounds.width, bounds.height)
+        svg = svg_start(bounds.width * scale, bounds.height * scale)
 
         initial_transformation =
+          Geom::Transformation.scaling(ORIGIN, scale) *
           Geom::Transformation.translation(bounds.min).inverse *
           Geom::Transformation.scaling(bounds.center, 1, -1, 1)
 
