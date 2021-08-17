@@ -10,7 +10,7 @@ module Eneroth
         model.selection.each { |e| bounds.add(e.bounds) }
 
         # TODO: Ask scale
-        scale = 0.1
+        scale = 1
 
         basename = File.basename(model.path)
         basename = "Untitled" if basename.empty? # REVIEW: Want to have the translated name.
@@ -28,8 +28,11 @@ module Eneroth
           Geom::Transformation.translation(bounds.min).inverse *
           Geom::Transformation.scaling(bounds.center, 1, -1, 1)
 
-        traverse(model.selection, initial_transformation) do |entity, transformation|
+        traverse(model.selection) do |instance_path|
+          entity = instance_path.to_a.last
           next unless entity.is_a?(Sketchup::Face)
+
+          transformation = initial_transformation * instance_path.transformation
           svg += svg_path(entity, transformation)
           # TODO: Add edge support?
         end
@@ -37,25 +40,35 @@ module Eneroth
 
         File.write(path, svg)
       end
-      
-      # TODO: Extract traversing stuff to other file. Yield InstancePath.
-      # Have param for wysiwyg.
-      # Add helper method for resolving material from InstancePath.
-      # Add helper method for resolving color from material or nil.
 
+
+      # TODO: Break out to Traverser module. Make other methods private.
+
+      # Traverse model hierarchy.
+      #
       # @param entities [Sketchup::Entities, Array<Sketchup::DrawingElement>, Sketchup::Selection]
       #
-      # @yieldparam entity [Sketchup::DrawingElement]
-      # @yieldparam
-      def self.traverse(entities, transformation = IDENTITY, &block)
+      # @yieldparam instance_path [InstancePath]
+      def self.traverse(entities, &block)
+        # TODO: Add wysiwyg param. Rely on new resolve_visible?
+
+        raise ArgumentError, "No block given." unless block_given?
+        traverse_with_backtrace(entities, [], &block)
+      end
+
+      def self.traverse_with_backtrace(entities, backtrace, &block)
         entities.each do |entity|
-          if entity.is_a? Sketchup::Group || Sketchup::ComponentInstance
-            traverse(entity.definition.entities, transformation * entity.transformation, &block)
-          else
-            block.call(entity, transformation)
-          end
+          yield Sketchup::InstancePath.new(backtrace + [entity])
+          next unless instance?(entity)
+
+          traverse_with_backtrace(entity.definition.entities, backtrace + [entity], &block)
         end
       end
+
+      def self.instance?(entity)
+        entity.is_a?(Sketchup::Group) || entity.is_a?(Sketchup::ComponentInstance)
+      end
+
 
       def self.svg_start(width, height)
         "<svg xmlns=\"http://www.w3.org/2000/svg\""\
