@@ -1,0 +1,208 @@
+require: rubocop-sketchup
+
+AllCops:
+  Exclude:
+    - 'src/*/vendor/**/*'
+  DisplayCopNames: true
+  # Should really be Ruby 2.2.4 for SketchUp 2017 but Rubocop has dropped that
+  # option.
+  TargetRubyVersion: 2.4
+  SketchUp:
+    TargetSketchUpVersion: 2017
+
+# Too noisy. Rely on MethodLength instead.
+Metrics/AbcSize:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# Aim for 10 lines or less but accept longer ones when things can't be extracted
+# to sensible methods.
+Metrics/MethodLength:
+  Max: 20
+
+# SketchUp Tool interface and observer interfaces don't follow Ruby naming
+# conventions.
+Naming/MethodName:
+  IgnoredPatterns:
+    # Tool
+    - '^\s*enableVCB\?(\(.*\))?$'
+    - '^\s*getExtents(\(.*\))?$'
+    - '^\s*getInstructorContentDirectory(\(.*\))?$'
+    - '^\s*getMenu(\(.*\))?$'
+    - '^\s*onCancel(\(.*\))?$'
+    - '^\s*onKeyDown(\(.*\))?$'
+    - '^\s*onKeyUp(\(.*\))?$'
+    - '^\s*onLButtonDoubleClick(\(.*\))?$'
+    - '^\s*onLButtonDown(\(.*\))?$'
+    - '^\s*onLButtonUp(\(.*\))?$'
+    - '^\s*onMButtonDoubleClick(\(.*\))?$'
+    - '^\s*onMButtonDown(\(.*\))?$'
+    - '^\s*onMButtonUp(\(.*\))?$'
+    - '^\s*onMouseEnter(\(.*\))?$'
+    - '^\s*onMouseLeave(\(.*\))?$'
+    - '^\s*onMouseMove(\(.*\))?$'
+    - '^\s*onMouseWheel(\(.*\))?$'
+    - '^\s*onRButtonDown(\(.*\))?$'
+    - '^\s*onRButtonUp(\(.*\))?$'
+    - '^\s*onReturn(\(.*\))?$'
+    - '^\s*onSetCursor(\(.*\))?$'
+    - '^\s*onUserText(\(.*\))?$'
+    # AppObserver
+    - '^\s*expectsStartupModelNotifications(\(.*\))?$'
+    - '^\s*onActivateModel(\(.*\))?$'
+    - '^\s*onNewModel(\(.*\))?$'
+    - '^\s*onOpenModel(\(.*\))?$'
+    - '^\s*onQuit(\(.*\))?$'
+    - '^\s*onUnloadExtension(\(.*\))?$'
+    # DefinitionObserver
+    - '^\s*onComponentInstanceAdded(\(.*\))?$'
+    - '^\s*onComponentInstanceRemoved(\(.*\))?$'
+    # DefinitionsObserver
+    - '^\s*onComponentAdded(\(.*\))?$'
+    - '^\s*onComponentPropertiesChanged(\(.*\))?$'
+    - '^\s*onComponentRemoved(\(.*\))?$'
+    - '^\s*onComponentTypeChanged(\(.*\))?$'
+    # DimensionsObserver
+    - '^\s*onTextChanged(\(.*\))?$'
+    # EntitiesObserver
+    - '^\s*onActiveSectionPlaneChanged(\(.*\))?$'
+    - '^\s*onElementAdded(\(.*\))?$'
+    - '^\s*onElementModified(\(.*\))?$'
+    - '^\s*onElementRemoved(\(.*\))?$'
+    - '^\s*onEraseEntities(\(.*\))?$'
+    # EntityObserver
+    - '^\s*onChangeEntity(\(.*\))?$'
+    - '^\s*onEraseEntity(\(.*\))?$'
+    # FrameChangeObserver
+    - '^\s*frameChange(\(.*\))?$'
+    # InstanceObserver
+    - '^\s*onClose(\(.*\))?$'
+    - '^\s*onOpen(\(.*\))?$'
+    # LayersObserver
+    - '^\s*onCurrentLayerChangedS(\(.*\))?$'
+    - '^\s*onLayerAdded(\(.*\))?$'
+    - '^\s*onLayerChanged(\(.*\))?$'
+    - '^\s*onLayerRemoved(\(.*\))?$'
+    - '^\s*onRemoveAllLayers(\(.*\))?$'
+    # MaterialsObserver
+    - '^\s*onMaterialAdd(\(.*\))?$'
+    - '^\s*onMaterialChange(\(.*\))?$'
+    - '^\s*onMaterialRefChange(\(.*\))?$'
+    - '^\s*onMaterialRemove(\(.*\))?$'
+    - '^\s*onMaterialSetCurrent(\(.*\))?$'
+    - '^\s*onMaterialUndoRedo(\(.*\))?$'
+    # ModelObserver
+    - '^\s*onActivePathChanged(\(.*\))?$'
+    - '^\s*onAfterComponentSaveAs(\(.*\))?$'
+    - '^\s*onBeforeComponentSaveAs(\(.*\))?$'
+    - '^\s*onDeleteModel(\(.*\))?$'
+    - '^\s*onEraseAll(\(.*\))?$'
+    - '^\s*onExplode(\(.*\))?$'
+    - '^\s*onPidChanged(\(.*\))?$'
+    - '^\s*onPlaceComponent(\(.*\))?$'
+    - '^\s*onPostSaveModel(\(.*\))?$'
+    - '^\s*onPreSaveModel(\(.*\))?$'
+    - '^\s*onSaveModel(\(.*\))?$'
+    - '^\s*onTransactionAbort(\(.*\))?$'
+    - '^\s*onTransactionCommit(\(.*\))?$'
+    - '^\s*onTransactionEmpty(\(.*\))?$'
+    - '^\s*onTransactionRedo(\(.*\))?$'
+    - '^\s*onTransactionStart(\(.*\))?$'
+    - '^\s*onTransactionUndo(\(.*\))?$'
+    # OptionsproviderObserver
+    - '^\s*onOptionsProviderChanged(\(.*\))?$'
+    # PagesObserver
+    - '^\s*onContentsModified(\(.*\))?$'
+    - '^\s*onElementAdded(\(.*\))?$'
+    - '^\s*onElementRemoved(\(.*\))?$'
+    # RenderingOptionsObserver
+    - '^\s*onRenderingOptionsChanged(\(.*\))?$'
+    # SelectionObserver
+    - '^\s*onSelectionAdded(\(.*\))?$'
+    - '^\s*onSelectionBulkChange(\(.*\))?$'
+    - '^\s*onSelectionCleared(\(.*\))?$'
+    - '^\s*onSelectionRemoved(\(.*\))?$'
+    - '^\s*onSelectedRemoved(\(.*\))?$'
+    # ShadowInfoObserver
+    - '^\s*onShadowInfoChanged(\(.*\))?$'
+    # ToolsObserver
+    - '^\s*onActiveToolChanged(\(.*\))?$'
+    - '^\s*onToolStateChanged(\(.*\))?$'
+    # ViewObserver
+    - '^\s*onViewChanged(\(.*\))?$'
+
+# Allow common names in SketchUp 3d modeling.
+Naming/MethodParameterName:
+  AllowedNames:
+    - 'x'
+    - 'y'
+    - 'z'
+    - 'u'
+    - 'v'
+    - 'uv'
+    - 'ip'
+
+Layout/HashAlignment:
+  EnforcedColonStyle: table
+
+# Let Git client handle file endings.
+Layout/EndOfLine:
+  Enabled: false
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+
+# False positives for modules documented in one file but not another, e.g. the
+# extension wrapper.
+Style/Documentation:
+  Enabled: false
+
+# Double negation is a handy Ruby idiom to assure a value is a boolean, as there
+# is no to_bool/to_boolean/to_b method. What the cop suggest, !var.nil?, doesn't
+# even cater for boolean false as input.
+Style/DoubleNegation:
+  Enabled: false
+
+# This style is a personal preference.
+Style/NilComparison:
+  Enabled: false
+
+# This style is a personal preference.
+Style/NonNilCheck:
+  Enabled: false
+
+# This style is a personal preference.
+Style/NumericPredicate:
+  Enabled: false
+
+# Not available in SketchUp 2018 and 2017 (Ruby 2.2.4).
+Style/SafeNavigation:
+  Enabled: false
+
+# Single quotes being faster is hardly measurable and only affects parse time.
+# Enforcing double quotes reduces the times where you need to change them
+# when introducing an interpolation. Use single quotes only if their semantics
+# are needed.
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# rubocop-sketchup
+
+# Enable all SketchUp cops.
+SketchupDeprecations:
+  Enabled: true
+SketchupPerformance:
+  Enabled: true
+SketchupRequirements:
+  Enabled: true
+SketchupSuggestions:
+  Enabled: true
+SketchupBugs:
+  Enabled: true
+
+

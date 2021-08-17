@@ -1,0 +1,3 @@
+src/**/*.rb
+--no-private
+--markup=markdown
