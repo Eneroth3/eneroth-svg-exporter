@@ -33,7 +33,8 @@ module Eneroth
           next unless entity.is_a?(Sketchup::Face)
 
           transformation = initial_transformation * instance_path.transformation
-          svg += svg_path(entity, transformation)
+          color = resolve_color(instance_path)
+          svg += svg_path(entity, transformation, color)
           # TODO: Add edge support?
         end
         svg += svg_end
@@ -81,7 +82,7 @@ module Eneroth
         "</svg>\n"
       end
 
-      def self.svg_path(face, transformation)
+      def self.svg_path(face, transformation, color)
         d = face.vertices.map do |vertex|
           position = vertex.position.transform(transformation)
           "L #{format_length(position.x)} #{format_length(position.y)}"
@@ -89,8 +90,7 @@ module Eneroth
         # First "command" should be move to, not line to.
         d[0] = "M"
 
-        # TODO: Lookup color smarter. Support no material.
-        "<path d=\"#{d}\" fill=\"#{format_color(face.material.color)}\" />\n"
+        "<path d=\"#{d}\" fill=\"#{format_color(color)}\" />\n"
       end
 
       def self.format_length(length)
@@ -102,7 +102,37 @@ module Eneroth
       end
 
       def self.format_color(color)
+        # FIXME: 0 pad to 2 chars per channel
         "#" + color.to_a.map { |c| c.to_s(16).upcase }.join
+      end
+
+
+
+      # TODO: Break out to InstancePathHelper module.
+
+      # Get the display color for a DrawingElement, honoring SketchUp's
+      # material inheritance model and default material.
+      #
+      # @param instance_path [Sketchup::InstancePath]
+      #
+      # @return [Sketchup::Material, nil]
+      def self.resolve_color(instance_path)
+        material = resolve_material(instance_path)
+        return material.color if material
+
+        Sketchup.active_model.rendering_options["FaceFrontColor"]
+      end
+
+      # Get the display material for a DrawingElement, honoring SketchUp's
+      # material inheritance model.
+      #
+      # @param instance_path [Sketchup::InstancePath]
+      #
+      # @return [Sketchup::Material, nil]
+      def self.resolve_material(instance_path)
+        instance_path.to_a.reverse.each do |entity|
+          return entity.material if entity.material
+        end
       end
     end
   end
