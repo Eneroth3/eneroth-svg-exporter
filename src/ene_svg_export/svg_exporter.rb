@@ -102,8 +102,7 @@ module Eneroth
       end
 
       def self.format_color(color)
-        # FIXME: 0 pad to 2 chars per channel
-        "#" + color.to_a.map { |c| c.to_s(16).upcase }.join
+        "#" + color.to_a.map { |c| sprintf("%02x", c) }.join.upcase
       end
 
 
