@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+Sketchup.require "ene_svg_export/traverser"
+Sketchup.require "ene_svg_export/instance_path_helper"
+
 module Eneroth
   module SVGExport
     module SVGExporter
@@ -28,12 +31,12 @@ module Eneroth
           Geom::Transformation.translation(bounds.min).inverse *
           Geom::Transformation.scaling(bounds.center, 1, -1, 1)
 
-        traverse(model.selection) do |instance_path|
+        Traverser.traverse(model.selection) do |instance_path|
           entity = instance_path.to_a.last
           next unless entity.is_a?(Sketchup::Face)
 
           transformation = initial_transformation * instance_path.transformation
-          color = resolve_color(instance_path)
+          color = InstancePathHelper.resolve_color(instance_path)
           svg += svg_path(entity, transformation, color)
           # TODO: Add edge support?
         end
@@ -41,35 +44,6 @@ module Eneroth
 
         File.write(path, svg)
       end
-
-
-      # TODO: Break out to Traverser module. Make other methods private.
-
-      # Traverse model hierarchy.
-      #
-      # @param entities [Sketchup::Entities, Array<Sketchup::DrawingElement>, Sketchup::Selection]
-      #
-      # @yieldparam instance_path [InstancePath]
-      def self.traverse(entities, &block)
-        # TODO: Add wysiwyg param. Rely on new resolve_visible?
-
-        raise ArgumentError, "No block given." unless block_given?
-        traverse_with_backtrace(entities, [], &block)
-      end
-
-      def self.traverse_with_backtrace(entities, backtrace, &block)
-        entities.each do |entity|
-          yield Sketchup::InstancePath.new(backtrace + [entity])
-          next unless instance?(entity)
-
-          traverse_with_backtrace(entity.definition.entities, backtrace + [entity], &block)
-        end
-      end
-
-      def self.instance?(entity)
-        entity.is_a?(Sketchup::Group) || entity.is_a?(Sketchup::ComponentInstance)
-      end
-
 
       def self.svg_start(width, height)
         "<svg xmlns=\"http://www.w3.org/2000/svg\""\
@@ -103,35 +77,6 @@ module Eneroth
 
       def self.format_color(color)
         "#" + color.to_a.map { |c| sprintf("%02x", c) }.join.upcase
-      end
-
-
-
-      # TODO: Break out to InstancePathHelper module.
-
-      # Get the display color for a DrawingElement, honoring SketchUp's
-      # material inheritance model and default material.
-      #
-      # @param instance_path [Sketchup::InstancePath]
-      #
-      # @return [Sketchup::Material, nil]
-      def self.resolve_color(instance_path)
-        material = resolve_material(instance_path)
-        return material.color if material
-
-        Sketchup.active_model.rendering_options["FaceFrontColor"]
-      end
-
-      # Get the display material for a DrawingElement, honoring SketchUp's
-      # material inheritance model.
-      #
-      # @param instance_path [Sketchup::InstancePath]
-      #
-      # @return [Sketchup::Material, nil]
-      def self.resolve_material(instance_path)
-        instance_path.to_a.reverse.each do |entity|
-          return entity.material if entity.material
-        end
       end
     end
   end
