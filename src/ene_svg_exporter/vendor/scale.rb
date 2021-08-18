@@ -1,5 +1,5 @@
 # Represents the scale of a view or drawing.
-class Eneroth::SVGExport::Scale
+class Eneroth::SVGExporter::Scale
   include Comparable
 
   # Multiples of 10^N used in common scales.

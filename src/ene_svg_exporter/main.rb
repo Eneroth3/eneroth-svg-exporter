@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-Sketchup.require "ene_svg_export/svg_exporter"
+Sketchup.require "ene_svg_exporter/exporter"
 
 module Eneroth
-  module SVGExport
+  module SVGExporter
     # Reload extension.
     #
     # @param clear_console [Boolean] Whether console should be cleared.
@@ -29,7 +29,7 @@ module Eneroth
     unless @loaded
       @loaded = true
       
-      command = UI::Command.new(EXTENSION.name) { SVGExporter.export }
+      command = UI::Command.new(EXTENSION.name) { Exporter.export }
       command.tooltip = EXTENSION.name
       command.status_bar_text = EXTENSION.description
 

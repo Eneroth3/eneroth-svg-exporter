@@ -5,7 +5,7 @@ require "extensions.rb"
 # Eneroth Extensions
 module Eneroth
   # Eneroth SVG Export
-  module SVGExport
+  module SVGExporter
     # Correct for encoding issue in Windows.
     # https://sketchucation.com/forums/viewtopic.php?f=180&t=57017
     path = __FILE__.dup.force_encoding("UTF-8")

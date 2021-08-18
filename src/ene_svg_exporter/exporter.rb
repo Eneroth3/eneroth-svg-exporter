@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-Sketchup.require "ene_svg_export/traverser"
-Sketchup.require "ene_svg_export/instance_path_helper"
-Sketchup.require "ene_svg_export/vendor/scale"
+Sketchup.require "ene_svg_exporter/traverser"
+Sketchup.require "ene_svg_exporter/instance_path_helper"
+Sketchup.require "ene_svg_exporter/vendor/scale"
 
 module Eneroth
-  module SVGExport
-    module SVGExporter
+  module SVGExporter
+    module Exporter
       @scale ||= Scale.new(1)
       
       def self.export

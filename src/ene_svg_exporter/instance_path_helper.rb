@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-Sketchup.require "ene_svg_export/traverser"
-Sketchup.require "ene_svg_export/instance_path_helper"
+Sketchup.require "ene_svg_exporter/traverser"
+Sketchup.require "ene_svg_exporter/instance_path_helper"
 
 module Eneroth
-  module SVGExport
+  module SVGExporter
     # Functionality related to `Sketchup::InstancePath`.
     module InstancePathHelper
       # Get the display color for a DrawingElement, honoring SketchUp's
