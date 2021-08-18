@@ -68,12 +68,22 @@ module Eneroth
       end
 
       def self.svg_path(face, transformation, color)
-        d = face.vertices.map do |vertex|
+        d = face.outer_loop.vertices.map do |vertex|
           position = vertex.position.transform(transformation)
           "L #{format_length(position.x)} #{format_length(position.y)}"
         end.join(" ")
         # First "command" should be move to, not line to.
         d[0] = "M"
+        
+        # Inner loops, skip loops[0] as it is the outer loop.
+        face.loops[1..-1].each do |loop|
+          d_inner = loop.vertices.map do |vertex|
+            position = vertex.position.transform(transformation)
+            "L #{format_length(position.x)} #{format_length(position.y)}"
+          end.join(" ")
+          d_inner[0] = "M"
+          d += d_inner
+        end
 
         "<path d=\"#{d}\" fill=\"#{format_color(color)}\" />\n"
       end
