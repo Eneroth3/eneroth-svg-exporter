@@ -30,6 +30,8 @@ module Eneroth
         instance_path.to_a.reverse.each do |entity|
           return entity.material if entity.material
         end
+        
+        nil
       end
     end
   end
