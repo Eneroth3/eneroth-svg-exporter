@@ -87,7 +87,7 @@ module Eneroth
       end
 
       def self.format_color(color)
-        "#" + color.to_a.map { |c| sprintf("%02x", c) }.join.upcase
+        "#" + color.to_a.values_at(0..2).map { |c| sprintf("%02x", c) }.join.upcase
       end
     end
   end
