@@ -33,6 +33,21 @@ module Eneroth
         
         nil
       end
+      
+      # Get the display state for a DrawingElement, honoring SketchUp's
+      # material inheritance model.
+      #
+      # @param instance_path [Sketchup::InstancePath]
+      #
+      # @return [Boolean]
+      def self.resolve_visibility?(instance_path)
+        instance_path.to_a.each do |entity|
+          return false if entity.hidden?
+          return false unless entity.layer.visible?
+        end
+        
+        true
+      end
     end
   end
 end
