@@ -10,7 +10,9 @@ module Eneroth
       #
       # @yieldparam instance_path [InstancePath]
       def self.traverse(entities, &block)
-        # TODO: Add wysiwyg param. Rely on new InstancePathHelper.resolve_visible?
+        # TODO: Add wysiwyg param.
+        # Rely on new InstancePathHelper.resolved_visiblity?
+        # Require InstancePathHelper.
 
         raise ArgumentError, "No block given." unless block_given?
         traverse_with_backtrace(entities, [], &block)
