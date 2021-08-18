@@ -15,7 +15,7 @@ module Eneroth
         # TODO: Ask scale
         scale = 1
 
-        basename = File.basename(model.path)
+        basename = File.basename(model.path, ".skp")
         basename = "Untitled" if basename.empty? # REVIEW: Want to have the translated name.
         path = UI.savepanel("Export SVG", nil, "#{basename}.svg")
         # REVIEW: Adding extension should ideally be done by underlying method,
