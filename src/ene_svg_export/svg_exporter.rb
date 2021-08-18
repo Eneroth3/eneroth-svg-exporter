@@ -2,18 +2,29 @@
 
 Sketchup.require "ene_svg_export/traverser"
 Sketchup.require "ene_svg_export/instance_path_helper"
+Sketchup.require "ene_svg_export/vendor/scale"
 
 module Eneroth
   module SVGExport
     module SVGExporter
+      @scale ||= Scale.new(1)
+      
       def self.export
+        results = UI.inputbox(["Scale"], [@scale.to_s], EXTENSION.name)
+        return unless results
+        
+        scale = Scale.new(results[0])
+        if scale.valid?
+          @scale = scale
+        else
+          UI.messagebox("Invalid scale.")
+          return
+        end
+
         model = Sketchup.active_model
 
         bounds = Geom::BoundingBox.new
         model.selection.each { |e| bounds.add(e.bounds) }
-
-        # TODO: Ask scale
-        scale = 1
 
         basename = File.basename(model.path, ".skp")
         basename = "Untitled" if basename.empty? # REVIEW: Want to have the translated name.
@@ -24,10 +35,10 @@ module Eneroth
 
         # For once the BoindingBox#height method (Y extents) is what we regard as
         # height, as we are doing a 2D on the XY plane. Wohoo!
-        svg = svg_start(bounds.width * scale, bounds.height * scale)
+        svg = svg_start(bounds.width * @scale.factor, bounds.height * @scale.factor)
 
         initial_transformation =
-          Geom::Transformation.scaling(ORIGIN, scale) *
+          Geom::Transformation.scaling(ORIGIN, @scale.factor) *
           Geom::Transformation.translation(bounds.min).inverse *
           Geom::Transformation.scaling(bounds.center, 1, -1, 1)
 
