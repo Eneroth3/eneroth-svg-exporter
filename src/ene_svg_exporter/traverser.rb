@@ -9,6 +9,7 @@ module Eneroth
       # Traverse model hierarchy.
       #
       # @param entities [Sketchup::Entities, Array<Sketchup::DrawingElement>, Sketchup::Selection]
+      # @param wysiwyg [Boolean] Whether to skip elements that are currently hidden.
       #
       # @yieldparam instance_path [InstancePath]
       def self.traverse(entities, wysiwyg = true, &block)
