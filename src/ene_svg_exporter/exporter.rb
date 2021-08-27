@@ -10,31 +10,21 @@ module Eneroth
       @scale ||= Scale.new(1)
 
       def self.export
-        results = UI.inputbox(["Scale"], [@scale.to_s], EXTENSION.name)
-        return unless results
+        scale = prompt_scale(@scale)
+        return unless scale
 
-        scale = Scale.new(results[0])
-        if scale.valid?
-          @scale = scale
-        else
-          UI.messagebox("Invalid scale.")
-          return
-        end
+        @scale = scale
 
         model = Sketchup.active_model
+
+        path = prompt_path(model, ".svg")
+        return unless path
 
         bounds = Geom::BoundingBox.new
         model.selection.each { |e| bounds.add(e.bounds) }
 
-        basename = File.basename(model.path, ".skp")
-        basename = "Untitled" if basename.empty? # REVIEW: Want to have the translated name.
-        path = UI.savepanel("Export SVG", nil, "#{basename}.svg")
-        # REVIEW: Adding extension should ideally be done by underlying method,
-        # and honored in file overwrite warning).
-        path += ".svg" unless path.end_with?("svg")
-
         # For once the BoindingBox#height method (Y extents) is what we regard as
-        # height, as we are doing a 2D on the XY plane. Wohoo!
+        # height, as we are doing a 2D view on the horizontal plane. Wohoo!
         svg = svg_start(bounds.width * @scale.factor, bounds.height * @scale.factor)
 
         initial_transformation =
@@ -42,7 +32,50 @@ module Eneroth
           Geom::Transformation.translation(bounds.min).inverse *
           Geom::Transformation.scaling(bounds.center, 1, -1, 1)
 
-        Traverser.traverse(model.selection) do |instance_path|
+        svg += svg_content(model.selection, initial_transformation)
+        svg += svg_end
+
+        File.write(path, svg)
+      end
+
+      def self.prompt_scale(default)
+        results = UI.inputbox(["Scale"], [default.to_s], EXTENSION.name)
+        return unless results
+
+        scale = Scale.new(results[0])
+        unless scale.valid?
+          UI.messagebox("Invalid scale.")
+          return
+        end
+
+        scale
+      end
+
+      def self.prompt_path(model, extension)
+        basename = File.basename(model.path, ".skp")
+        # REVIEW: Want to have the translated name if running localized SU version.
+        basename = "Untitled" if basename.empty?
+        path = UI.savepanel("Export SVG", nil, "#{basename}#{extension}")
+        return unless path
+
+        # REVIEW: Adding extension should ideally be done by underlying method,
+        # and honored in file overwrite warning.
+        path += extension unless path.end_with?(extension)
+
+        path
+      end
+
+      def self.svg_start(width, height)
+        "<svg xmlns=\"http://www.w3.org/2000/svg\""\
+        " width=\"#{format_length_with_unit(width)}\""\
+        " height=\"#{format_length_with_unit(height)}\""\
+        " viewBox=\"0 0 #{format_length(width)} #{format_length(height)}\">\n"
+      end
+
+      def self.svg_content(entities, initial_transformation)
+        svg = ""
+
+        Traverser.traverse(entities) do |instance_path|
           entity = instance_path.to_a.last
           next unless entity.is_a?(Sketchup::Face)
 
@@ -51,16 +84,8 @@ module Eneroth
           svg += svg_path(entity, transformation, color)
           # TODO: Add edge support?
         end
-        svg += svg_end
 
-        File.write(path, svg)
-      end
-
-      def self.svg_start(width, height)
-        "<svg xmlns=\"http://www.w3.org/2000/svg\""\
-        " width=\"#{format_length_with_unit(width)}\""\
-        " height=\"#{format_length_with_unit(height)}\""\
-        " viewBox=\"0 0 #{format_length(width)} #{format_length(height)}\">\n"
+        svg
       end
 
       def self.svg_end
