@@ -8,11 +8,11 @@ module Eneroth
   module SVGExporter
     module Exporter
       @scale ||= Scale.new(1)
-      
+
       def self.export
         results = UI.inputbox(["Scale"], [@scale.to_s], EXTENSION.name)
         return unless results
-        
+
         scale = Scale.new(results[0])
         if scale.valid?
           @scale = scale
@@ -74,7 +74,7 @@ module Eneroth
         end.join(" ")
         # First "command" should be move to, not line to.
         d[0] = "M"
-        
+
         # Inner loops, skip loops[0] as it is the outer loop.
         face.loops[1..-1].each do |loop|
           d_inner = loop.vertices.map do |vertex|
@@ -89,7 +89,7 @@ module Eneroth
       end
 
       def self.format_length(length)
-        "#{length.to_mm}"
+        length.to_mm.to_s
       end
 
       def self.format_length_with_unit(length)
@@ -97,7 +97,7 @@ module Eneroth
       end
 
       def self.format_color(color)
-        "#" + color.to_a.values_at(0..2).map { |c| sprintf("%02x", c) }.join.upcase
+        "#" + color.to_a.values_at(0..2).map { |c| format("%02x", c) }.join.upcase
       end
     end
   end

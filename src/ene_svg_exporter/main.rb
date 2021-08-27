@@ -28,7 +28,7 @@ module Eneroth
 
     unless @loaded
       @loaded = true
-      
+
       command = UI::Command.new(EXTENSION.name) { Exporter.export }
       command.tooltip = EXTENSION.name
       command.status_bar_text = EXTENSION.description

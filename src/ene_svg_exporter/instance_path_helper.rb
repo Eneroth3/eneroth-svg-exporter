@@ -30,12 +30,12 @@ module Eneroth
         instance_path.to_a.reverse.each do |entity|
           return entity.material if entity.material
         end
-        
+
         nil
       end
-      
+
       # Get the display state for a DrawingElement, honoring SketchUp's
-      # material inheritance model.
+      # visibility inheritance model.
       #
       # @param instance_path [Sketchup::InstancePath]
       #
@@ -45,7 +45,7 @@ module Eneroth
           return false if entity.hidden?
           return false unless entity.layer.visible?
         end
-        
+
         true
       end
     end

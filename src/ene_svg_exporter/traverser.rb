@@ -14,16 +14,17 @@ module Eneroth
       # @yieldparam instance_path [InstancePath]
       def self.traverse(entities, wysiwyg = true, &block)
         raise ArgumentError, "No block given." unless block_given?
+
         traverse_with_backtrace(entities, [], wysiwyg, &block)
       end
-      
+
       # Private
 
       def self.traverse_with_backtrace(entities, backtrace, wysiwyg, &block)
         entities.each do |entity|
           instance_path = Sketchup::InstancePath.new(backtrace.to_a + [entity])
           next unless InstancePathHelper.resolve_visibility?(instance_path)
-          
+
           yield instance_path
           next unless instance?(entity)
 
