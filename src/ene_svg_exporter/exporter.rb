@@ -6,9 +6,11 @@ Sketchup.require "ene_svg_exporter/vendor/scale"
 
 module Eneroth
   module SVGExporter
+    # SVG Exporter
     module Exporter
       @scale ||= Scale.new(1)
 
+      # Export top view of selected entities to a SVG.
       def self.export
         scale = prompt_scale(@scale)
         return unless scale
@@ -38,6 +40,12 @@ module Eneroth
         File.write(path, svg)
       end
 
+      # Ask the user for a scale.
+      # Shows error message and returns `nil` for invalid input.
+      #
+      # @param default [Scale]
+      #
+      # @return [Scale, nil]
       def self.prompt_scale(default)
         results = UI.inputbox(["Scale"], [default.to_s], EXTENSION.name)
         return unless results
@@ -51,6 +59,13 @@ module Eneroth
         scale
       end
 
+      # Ask the user for a path.
+      # Defaults to the name of the open model and forces a file extension.
+      #
+      # @param model [Sketchup::Model]
+      # @param extension [String] File extension including leading dot.
+      #
+      # @return [String, nil]
       def self.prompt_path(model, extension)
         basename = File.basename(model.path, ".skp")
         # REVIEW: Want to have the translated name if running localized SU version.
@@ -65,6 +80,12 @@ module Eneroth
         path
       end
 
+      # Generate SVG start.
+      #
+      # @param width [Length] in model space
+      # @param height [Length] in model space
+      #
+      # @return [String]
       def self.svg_start(width, height)
         "<svg xmlns=\"http://www.w3.org/2000/svg\""\
         " width=\"#{format_length_with_unit(width)}\""\
@@ -72,6 +93,12 @@ module Eneroth
         " viewBox=\"0 0 #{format_length(width)} #{format_length(height)}\">\n"
       end
 
+      # Generate SVG content/middle.
+      #
+      # @param entities [Sketchup::Selection, Sketchup::Entities, Array<Sketchup::Drawingelement>]
+      # @param initial_transformation [Geom::Transformation] from model space to paper space.
+      #
+      # @return [String]
       def self.svg_content(entities, initial_transformation)
         svg = ""
 
@@ -88,10 +115,20 @@ module Eneroth
         svg
       end
 
+      # Generate SVG end.
+      #
+      # @return [String]
       def self.svg_end
         "</svg>\n"
       end
 
+      # Generate SVG path.
+      #
+      # @param face [Sketchup::Face]
+      # @param transformation [Geom::Transformation] from local space to paper space.
+      # @param color [Sketchup::Color]
+      #
+      # @return [String]
       def self.svg_path(face, transformation, color)
         d = face.outer_loop.vertices.map do |vertex|
           position = vertex.position.transform(transformation)
@@ -113,14 +150,29 @@ module Eneroth
         "<path d=\"#{d}\" fill=\"#{format_color(color)}\" />\n"
       end
 
+      # Format a length for SVG, without unit.
+      #
+      # @param length [Length]
+      #
+      # @return [String]
       def self.format_length(length)
         length.to_mm.to_s
       end
 
+      # Format a length for SVG, with unit.
+      #
+      # @param length [Length]
+      #
+      # @return [String]
       def self.format_length_with_unit(length)
         "#{format_length(length)}mm"
       end
 
+      # Format a color for SVG.
+      #
+      # @param color [Sketchup::Color]
+      #
+      # @return [String]
       def self.format_color(color)
         "#" + color.to_a.values_at(0..2).map { |c| format("%02x", c) }.join.upcase
       end
