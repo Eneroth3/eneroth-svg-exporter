@@ -1,3 +1,5 @@
+# See https://github.com/Eneroth3/Scale.
+
 # Represents the scale of a view or drawing.
 class Eneroth::SVGExporter::Scale
   include Comparable
