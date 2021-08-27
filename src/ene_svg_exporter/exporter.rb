@@ -27,8 +27,12 @@ module Eneroth
 
         # For once the BoindingBox#height method (Y extents) is what we regard as
         # height, as we are doing a 2D view on the horizontal plane. Wohoo!
+        # For any 3D work, this method is misnamed.
         svg = svg_start(bounds.width * @scale.factor, bounds.height * @scale.factor)
 
+        # Transformation from model space to paper space.
+        # Includes scaling, position of selection and moving the origin
+        # to the upper left corner with Y pointing downwards.
         initial_transformation =
           Geom::Transformation.scaling(ORIGIN, @scale.factor) *
           Geom::Transformation.translation(bounds.min).inverse *
@@ -68,7 +72,7 @@ module Eneroth
       # @return [String, nil]
       def self.prompt_path(model, extension)
         basename = File.basename(model.path, ".skp")
-        # REVIEW: Want to have the translated name if running localized SU version.
+        # REVIEW: Want to have the translated phrase if running localized SU version.
         basename = "Untitled" if basename.empty?
         path = UI.savepanel("Export SVG", nil, "#{basename}#{extension}")
         return unless path
@@ -82,8 +86,8 @@ module Eneroth
 
       # Generate SVG start.
       #
-      # @param width [Length] in model space
-      # @param height [Length] in model space
+      # @param width [Length] in paper space
+      # @param height [Length] in paper space
       #
       # @return [String]
       def self.svg_start(width, height)
