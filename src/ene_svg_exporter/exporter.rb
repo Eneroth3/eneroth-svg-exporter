@@ -12,18 +12,18 @@ module Eneroth
 
       # Export top view of selected entities to a SVG.
       def self.export
+        model = Sketchup.active_model
+        bounds = Geom::BoundingBox.new
+        model.selection.each { |e| bounds.add(e.bounds) }
+        return unless valid_extents?(bounds)
+
         scale = prompt_scale(@scale)
         return unless scale
 
         @scale = scale
 
-        model = Sketchup.active_model
-
         path = prompt_path(model, ".svg")
         return unless path
-
-        bounds = Geom::BoundingBox.new
-        model.selection.each { |e| bounds.add(e.bounds) }
 
         # For once the BoindingBox#height method (Y extents) is what we regard as
         # height, as we are doing a 2D view on the horizontal plane. Wohoo!
@@ -42,6 +42,21 @@ module Eneroth
         svg += svg_end
 
         File.write(path, svg)
+      end
+
+      # Check if the extents of the entities to export is valid.
+      # Prevents users from accidentally exporting a vertical object
+      # (which would just be a line in top view) or an empty selection.
+      #
+      # @param bounds [Geom::Boundingbox]
+      #
+      # @return [Boolean]
+      def self.valid_extents?(bounds)
+        return true unless bounds.height == 0 || bounds.width == 0
+
+        UI.messagebox("Please select some entities on the horizontal plane and try again.")
+
+        false
       end
 
       # Ask the user for a scale.
