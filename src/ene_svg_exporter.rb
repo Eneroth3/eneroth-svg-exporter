@@ -24,8 +24,8 @@ module Eneroth
 
     EXTENSION.creator     = "Eneroth"
     EXTENSION.description = "Export SVG from selection."
-    EXTENSION.version     = "1.0.0"
-    EXTENSION.copyright   = "2021, #{EXTENSION.creator}"
+    EXTENSION.version     = "1.0.1"
+    EXTENSION.copyright   = "2022, #{EXTENSION.creator}"
     Sketchup.register_extension(EXTENSION, true)
   end
 end
