@@ -155,14 +155,18 @@ module Eneroth
         end.join(" ")
         # First "command" should be move to, not line to.
         d[0] = "M"
+        # Close loop
+        d += "Z"
 
-        # Inner loops, skip loops[0] as it is the outer loop.
+        # Inner loops
+        # Skipping loops[0] as it is the outer loop.
         face.loops[1..-1].each do |loop|
           d_inner = loop.vertices.map do |vertex|
             position = vertex.position.transform(transformation)
             "L #{format_length(position.x)} #{format_length(position.y)}"
           end.join(" ")
           d_inner[0] = "M"
+          d_inner += "Z"
           d += d_inner
         end
 
