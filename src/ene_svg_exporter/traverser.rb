@@ -21,7 +21,8 @@ module Eneroth
       # Private
 
       def self.traverse_with_backtrace(entities, backtrace, wysiwyg, &block)
-        entities.each do |entity|
+        # TODO: Break out sorting by Z value from general traverse thing to the implementation using it.
+        entities.sort_by { |e| e.bounds.min.z }.each do |entity|
           instance_path = Sketchup::InstancePath.new(backtrace.to_a + [entity])
           next unless InstancePathHelper.resolve_visibility?(instance_path)
 
